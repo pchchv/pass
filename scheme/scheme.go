@@ -2,6 +2,13 @@
 // Scheme interface and additional error definitions.
 package scheme
 
+import "errors"
+
+var (
+	ErrInvalidPassword   = errors.New("invalid password")
+	ErrUnsupportedScheme = errors.New("unsupported scheme")
+)
+
 // The Scheme interface provides an
 // abstract interface for implementing
 // a particular password hashing scheme.
