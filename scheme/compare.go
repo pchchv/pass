@@ -1,4 +1,4 @@
-package pass
+package scheme
 
 import "crypto/subtle"
 
