@@ -17,6 +17,16 @@ type argon2Scheme struct {
 
 const saltLength = 16
 
+func (c *argon2Scheme) Hash(password string) (string, error) {
+	stub, err := c.makeStub()
+	if err != nil {
+		return "", err
+	}
+
+	_, newHash, _, _, _, _, _, err := c.hash(password, stub)
+	return newHash, err
+}
+
 func (c *argon2Scheme) hash(password, stub string) (oldHashRaw []byte, newHash string, salt []byte, version int, memory, time uint32, threads uint8, err error) {
 	salt, oldHashRaw, version, time, memory, threads, err = raw.Parse(stub)
 	if err != nil {
