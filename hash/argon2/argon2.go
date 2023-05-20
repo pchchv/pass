@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/pchchv/pass/hash/argon2/raw"
 	"github.com/pchchv/pass/scheme"
@@ -17,6 +18,16 @@ type argon2Scheme struct {
 }
 
 const saltLength = 16
+
+func (c *argon2Scheme) SetParams(time, memory uint32, threads uint8) {
+	c.time = time
+	c.memory = memory
+	c.threads = threads
+}
+
+func (c *argon2Scheme) SupportsStub(stub string) bool {
+	return strings.HasPrefix(stub, "$argon2i$")
+}
 
 func (c *argon2Scheme) Hash(password string) (string, error) {
 	stub, err := c.makeStub()
