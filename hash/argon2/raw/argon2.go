@@ -48,6 +48,100 @@ func Argon2(password string, salt []byte, time, memory uint32, threads uint8) st
 	return fmt.Sprintf("$argon2i$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, memory, time, threads, strSalt, strHash)
 }
 
+// Parse parses an argon2 encoded hash.
+// The format is as follows:
+//
+//	    $argon2i$v=version$m=memory,t=time,p=threads$salt$hash   // hash
+//		$argon2i$v=version$m=memory,t=time,p=threads$salt        // stub
+func Parse(stub string) (salt, hash []byte, version int, time, memory uint32, parallelism uint8, err error) {
+	if len(stub) < 26 || !strings.HasPrefix(stub, "$argon2i$") {
+		err = ErrInvalidStub
+		return
+	}
+
+	// $argon2i$  v=version$m=memory,t=time,p=threads$salt-base64$hash-base64
+	parts := strings.Split(stub[9:], "$")
+
+	// version-params$hash-config-params$salt[$hash]
+	if len(parts) < 3 || len(parts) > 4 {
+		err = ErrInvalidStub
+		return
+	}
+
+	// Parse the first configuration part, the version parameters.
+	versionParams, err := parseKeyValue(parts[0])
+	if err != nil {
+		return
+	}
+
+	// Must be exactly one parameter in the version part.
+	if len(versionParams) != 1 {
+		err = ErrParseVersion
+		return
+	}
+
+	// It must be "v".
+	val, ok := versionParams["v"]
+	if !ok {
+		err = ErrMissingVersion
+		return
+	}
+
+	version = int(val)
+
+	// Parse the second configuration part, the hash config parameters.
+	hashParams, err := parseKeyValue(parts[1])
+	if err != nil {
+		return
+	}
+
+	// It must have exactly three parameters.
+	if len(hashParams) != 3 {
+		err = ErrParseConfig
+		return
+	}
+
+	// Memory parameter.
+	val, ok = hashParams["m"]
+	if !ok {
+		err = ErrMissingMemory
+		return
+	}
+
+	memory = uint32(val)
+
+	// Time parameter.
+	val, ok = hashParams["t"]
+	if !ok {
+		err = ErrMissingTime
+		return
+	}
+
+	time = uint32(val)
+
+	// Parallelism parameter.
+	val, ok = hashParams["p"]
+	if !ok {
+		err = ErrMissingParallelism
+		return
+	}
+
+	parallelism = uint8(val)
+
+	// Decode salt.
+	salt, err = base64.RawStdEncoding.DecodeString(parts[2])
+	if err != nil {
+		return
+	}
+
+	// Decode hash if present.
+	if len(parts) >= 4 {
+		hash, err = base64.RawStdEncoding.DecodeString(parts[3])
+	}
+
+	return
+}
+
 func parseKeyValue(pairs string) (result map[string]uint64, err error) {
 	parameterParts := strings.Split(pairs, ",")
 
