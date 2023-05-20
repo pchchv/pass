@@ -12,6 +12,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// New creates a new scheme implementing bcrypt.
+// The recommended cost is RecommendedCost.
+func New(cost int) scheme.Scheme {
+	return &bcryptScheme{
+		Cost: cost,
+	}
+}
 type bcryptScheme struct {
 	Cost int
 }
