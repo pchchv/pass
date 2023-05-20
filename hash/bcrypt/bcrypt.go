@@ -5,6 +5,19 @@
 // If you must use bcrypt, use bcrypt-sha256 instead.
 package bcrypt
 
+import (
+	"golang.org/x/crypto/bcrypt"
+)
+
 type bcryptScheme struct {
 	Cost int
+}
+
+func (s *bcryptScheme) Hash(password string) (hash string, err error) {
+	h, err := bcrypt.GenerateFromPassword([]byte(password), s.Cost)
+	if err != nil {
+		return
+	}
+
+	return string(h), nil
 }
