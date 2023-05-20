@@ -43,3 +43,12 @@ func (s *bcryptScheme) SupportsStub(stub string) bool {
 func (s *bcryptScheme) String() string {
 	return fmt.Sprintf("bcrypt(%d)", s.Cost)
 }
+
+func (s *bcryptScheme) NeedsUpdate(stub string) bool {
+	cost, err := bcrypt.Cost([]byte(stub))
+	if err != nil {
+		return false
+	}
+
+	return cost < s.Cost
+}
