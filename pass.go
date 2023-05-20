@@ -7,7 +7,9 @@
 // using default contexts and reasonable default values.
 package pass
 
-import "github.com/pchchv/pass/scheme"
+import (
+	"github.com/pchchv/pass/scheme"
+)
 
 // Context is a password hashing context that uses a
 // given set of schemes to hash and validate passwords.
@@ -21,7 +23,7 @@ type Context struct {
 
 func (ctx *Context) schemes() []scheme.Scheme {
 	if ctx.Schemes == nil {
-		return scheme.DefaultSchemes
+		return DefaultSchemes
 	}
 
 	return ctx.Schemes
