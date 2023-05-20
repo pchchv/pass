@@ -6,6 +6,8 @@
 package bcrypt
 
 import (
+	"fmt"
+
 	"github.com/pchchv/pass/scheme"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,4 +32,14 @@ func (s *bcryptScheme) Verify(password, hash string) (err error) {
 	}
 
 	return
+}
+
+func (s *bcryptScheme) SupportsStub(stub string) bool {
+	return len(stub) >= 3 && stub[0] == '$' && stub[1] == '2' &&
+		(stub[2] == '$' || (len(stub) >= 4 && stub[3] == '$' &&
+			(stub[2] == 'a' || stub[2] == 'b' || stub[2] == 'y')))
+}
+
+func (s *bcryptScheme) String() string {
+	return fmt.Sprintf("bcrypt(%d)", s.Cost)
 }
