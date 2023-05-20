@@ -4,6 +4,7 @@ package raw
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -17,7 +18,16 @@ const (
 	RecommendedThreads uint8  = 4         // Current recommended number of threads for interactive logins.
 )
 
-var ErrInvalidKeyValuePair = fmt.Errorf("invalid argon2 key-value pair")
+var (
+	ErrInvalidStub         = errors.New("invalid argon2 password stub")
+	ErrMissingTime         = errors.New("time parameter (t) is missing")
+	ErrParseConfig         = errors.New("hash config section has wrong number of parameters")
+	ErrParseVersion        = errors.New("version section has wrong number of parameters")
+	ErrMissingMemory       = errors.New("memory parameter (m) is missing")
+	ErrMissingVersion      = errors.New("version parameter (v) is missing")
+	ErrMissingParallelism  = errors.New("parallelism parameter (p) is missing")
+	ErrInvalidKeyValuePair = errors.New("invalid argon2 key-value pair")
+)
 
 // Wrapper for golang.org/x/crypto/argon2
 // that implements a sensible hashing interface.
