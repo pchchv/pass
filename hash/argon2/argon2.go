@@ -19,6 +19,15 @@ type argon2Scheme struct {
 
 const saltLength = 16
 
+// Returns an implementation of Scheme implementing argon2 with the specified parameters.
+func New(time, memory uint32, threads uint8) scheme.Scheme {
+	return &argon2Scheme{
+		time:    time,
+		memory:  memory,
+		threads: threads,
+	}
+}
+
 func (c *argon2Scheme) SetParams(time, memory uint32, threads uint8) {
 	c.time = time
 	c.memory = memory
