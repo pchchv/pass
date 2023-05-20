@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/pchchv/pass/hash/argon2/raw"
+	"github.com/pchchv/pass/scheme"
 	"golang.org/x/crypto/argon2"
 )
 type argon2Scheme struct {
@@ -25,6 +26,15 @@ func (c *argon2Scheme) Hash(password string) (string, error) {
 
 	_, newHash, _, _, _, _, _, err := c.hash(password, stub)
 	return newHash, err
+}
+
+func (c *argon2Scheme) Verify(password, hash string) (err error) {
+	_, newHash, _, _, _, _, _, err := c.hash(password, hash)
+	if err == nil && !scheme.SecureCompare(hash, newHash) {
+		err = scheme.ErrInvalidPassword
+	}
+
+	return
 }
 
 func (c *argon2Scheme) hash(password, stub string) (oldHashRaw []byte, newHash string, salt []byte, version int, memory, time uint32, threads uint8, err error) {
