@@ -12,12 +12,25 @@ import (
 	"github.com/pchchv/pass/scheme"
 	"golang.org/x/crypto/argon2"
 )
+
+const saltLength = 16
+
+// Implementation of Scheme performing argon2 hashing.
+// Uses the recommended values for time, memory and threads defined in raw.
+var Crypter scheme.Scheme
+
+func init() {
+	Crypter = New(
+		raw.RecommendedTime,
+		raw.RecommendedMemory,
+		raw.RecommendedThreads,
+	)
+}
+
 type argon2Scheme struct {
 	time, memory uint32
 	threads      uint8
 }
-
-const saltLength = 16
 
 // Returns an implementation of Scheme implementing argon2 with the specified parameters.
 func New(time, memory uint32, threads uint8) scheme.Scheme {
