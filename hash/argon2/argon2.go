@@ -37,6 +37,10 @@ func (c *argon2Scheme) Verify(password, hash string) (err error) {
 	return
 }
 
+func (c *argon2Scheme) String() string {
+	return fmt.Sprintf("argon2(%d,%d,%d,%d)", argon2.Version, c.memory, c.time, c.threads)
+}
+
 func (c *argon2Scheme) hash(password, stub string) (oldHashRaw []byte, newHash string, salt []byte, version int, memory, time uint32, threads uint8, err error) {
 	salt, oldHashRaw, version, time, memory, threads, err = raw.Parse(stub)
 	if err != nil {
