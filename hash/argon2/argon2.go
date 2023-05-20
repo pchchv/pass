@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	"github.com/pchchv/pass/hash/argon2/raw"
 	"golang.org/x/crypto/argon2"
 )
 type argon2Scheme struct {
@@ -15,6 +16,15 @@ type argon2Scheme struct {
 }
 
 const saltLength = 16
+
+func (c *argon2Scheme) hash(password, stub string) (oldHashRaw []byte, newHash string, salt []byte, version int, memory, time uint32, threads uint8, err error) {
+	salt, oldHashRaw, version, time, memory, threads, err = raw.Parse(stub)
+	if err != nil {
+		return
+	}
+
+	return oldHashRaw, raw.Argon2(password, salt, time, memory, threads), salt, version, memory, time, threads, nil
+}
 
 func (c *argon2Scheme) makeStub() (string, error) {
 	buf := make([]byte, saltLength)
