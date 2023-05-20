@@ -18,3 +18,11 @@ type Context struct {
 	// validated using a scheme that is not the first in this slice.
 	Schemes []scheme.Scheme
 }
+
+func (ctx *Context) schemes() []scheme.Scheme {
+	if ctx.Schemes == nil {
+		return scheme.DefaultSchemes
+	}
+
+	return ctx.Schemes
+}
