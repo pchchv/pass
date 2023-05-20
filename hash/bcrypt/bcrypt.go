@@ -6,6 +6,7 @@
 package bcrypt
 
 import (
+	"github.com/pchchv/pass/scheme"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,4 +21,13 @@ func (s *bcryptScheme) Hash(password string) (hash string, err error) {
 	}
 
 	return string(h), nil
+}
+
+func (s *bcryptScheme) Verify(password, hash string) (err error) {
+	err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return scheme.ErrInvalidPassword
+	}
+
+	return
 }
