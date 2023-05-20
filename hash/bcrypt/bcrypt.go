@@ -12,6 +12,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Implementation of Scheme implementing bcrypt.
+var Crypter scheme.Scheme
+
+// The recommended cost for bcrypt.
+// This may change with subsequent releases.
+// bcrypt.DefaultCost is a bit low (10), so use 12 instead.
+const RecommendedCost = 12
+
+func init() {
+	Crypter = New(RecommendedCost)
+}
+
 // New creates a new scheme implementing bcrypt.
 // The recommended cost is RecommendedCost.
 func New(cost int) scheme.Scheme {
@@ -19,6 +31,7 @@ func New(cost int) scheme.Scheme {
 		Cost: cost,
 	}
 }
+
 type bcryptScheme struct {
 	Cost int
 }
