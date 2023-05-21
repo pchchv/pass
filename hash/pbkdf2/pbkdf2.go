@@ -23,6 +23,14 @@ type pbkdf2Scheme struct {
 	Rounds   int
 }
 
+func New(ident string, hf func() hash.Hash, rounds int) scheme.Scheme {
+	return &pbkdf2Scheme{
+		Ident:    ident,
+		HashFunc: hf,
+		Rounds:   rounds,
+	}
+}
+
 func (s *pbkdf2Scheme) Hash(password string) (string, error) {
 	salt := make([]byte, SaltLength)
 	if _, err := rand.Read(salt); err != nil {
@@ -58,3 +66,27 @@ func (s *pbkdf2Scheme) NeedsUpdate(stub string) bool {
 	_, rounds, salt, _, err := raw.Parse(stub)
 	return err == raw.ErrInvalidRounds || rounds < s.Rounds || len(salt) < SaltLength
 }
+
+// // An implementation of Scheme implementing a number of PBKDF2 modular crypt
+// // formats used by Python's passlib ($pbkdf2$, $pbkdf2-sha256$,
+// // $pbkdf2-sha512$).
+// //
+// // Uses RecommendedRounds.
+// //
+// // WARNING: SHA1 should not be used for new applications under any
+// // circumstances. It should be used for legacy compatibility only.
+// var SHA1Crypter scheme.Scheme
+// var SHA256Crypter scheme.Scheme
+// var SHA512Crypter scheme.Scheme
+
+// const (
+// 	RecommendedRoundsSHA1   = 131000
+// 	RecommendedRoundsSHA256 = 29000
+// 	RecommendedRoundsSHA512 = 25000
+// )
+
+// func init() {
+// 	SHA1Crypter = New("$pbkdf2$", sha1.New, RecommendedRoundsSHA1)
+// 	SHA256Crypter = New("$pbkdf2-sha256$", sha256.New, RecommendedRoundsSHA256)
+// 	SHA512Crypter = New("$pbkdf2-sha512$", sha512.New, RecommendedRoundsSHA512)
+// }
