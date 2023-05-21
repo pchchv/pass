@@ -62,6 +62,19 @@ func (c *scryptSHA256Crypter) String() string {
 	return fmt.Sprintf("scrypt-sha256(%d,%d,%d)", c.nN, c.r, c.p)
 }
 
+func (c *scryptSHA256Crypter) NeedsUpdate(stub string) bool {
+	salt, _, N, r, p, err := raw.Parse(stub)
+	if err != nil {
+		return false
+	}
+
+	return c.needsUpdate(salt, N, r, p)
+}
+
+func (c *scryptSHA256Crypter) needsUpdate(salt []byte, N, r, p int) bool {
+	return len(salt) < 18 || N < c.nN || r < c.r || p < c.p
+}
+
 func (c *scryptSHA256Crypter) makeStub() (string, error) {
 	buf := make([]byte, 18)
 	if _, err := rand.Read(buf); err != nil {
