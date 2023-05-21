@@ -10,10 +10,12 @@ import (
 	"strings"
 
 	"github.com/pchchv/pass/hash/scrypt/raw"
+	"github.com/pchchv/pass/scheme"
 )
 
 var (
-	cScryptSHA256HashCalls = expvar.NewInt("passlib.scryptsha256.hashCalls")
+	cScryptSHA256HashCalls   = expvar.NewInt("passlib.scryptsha256.hashCalls")
+	cScryptSHA256VerifyCalls = expvar.NewInt("passlib.scryptsha256.verifyCalls")
 )
 
 type scryptSHA256Crypter struct {
@@ -30,6 +32,16 @@ func (c *scryptSHA256Crypter) Hash(password string) (hash string, err error) {
 	}
 
 	_, hash, _, _, _, _, err = c.hash(password, stub)
+
+	return
+}
+
+func (c *scryptSHA256Crypter) Verify(password, hash string) (err error) {
+	cScryptSHA256VerifyCalls.Add(1)
+	_, newHash, _, _, _, _, err := c.hash(password, hash)
+	if err == nil && !scheme.SecureCompare(hash, newHash) {
+		return scheme.ErrInvalidPassword
+	}
 
 	return
 }
