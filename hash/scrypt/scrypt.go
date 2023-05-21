@@ -5,15 +5,32 @@ package scrypt
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"expvar"
 	"fmt"
 
 	"github.com/pchchv/pass/hash/scrypt/raw"
+)
+
+var (
+	cScryptSHA256HashCalls = expvar.NewInt("passlib.scryptsha256.hashCalls")
 )
 
 type scryptSHA256Crypter struct {
 	nN int
 	r  int
 	p  int
+}
+
+func (c *scryptSHA256Crypter) Hash(password string) (hash string, err error) {
+	cScryptSHA256HashCalls.Add(1)
+	stub, err := c.makeStub()
+	if err != nil {
+		return "", err
+	}
+
+	_, hash, _, _, _, _, err = c.hash(password, stub)
+
+	return
 }
 
 func (c *scryptSHA256Crypter) makeStub() (string, error) {
