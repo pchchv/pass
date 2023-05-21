@@ -9,6 +9,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"hash"
+	"strings"
 
 	"github.com/pchchv/pass/hash/pbkdf2/raw"
 	"github.com/pchchv/pass/scheme"
@@ -47,4 +48,13 @@ func (s *pbkdf2Scheme) Verify(password, stub string) error {
 	}
 
 	return nil
+}
+
+func (s *pbkdf2Scheme) SupportsStub(stub string) bool {
+	return strings.HasPrefix(stub, s.Ident)
+}
+
+func (s *pbkdf2Scheme) NeedsUpdate(stub string) bool {
+	_, rounds, salt, _, err := raw.Parse(stub)
+	return err == raw.ErrInvalidRounds || rounds < s.Rounds || len(salt) < SaltLength
 }
