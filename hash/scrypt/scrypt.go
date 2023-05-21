@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"expvar"
 	"fmt"
+	"strings"
 
 	"github.com/pchchv/pass/hash/scrypt/raw"
 )
@@ -31,6 +32,18 @@ func (c *scryptSHA256Crypter) Hash(password string) (hash string, err error) {
 	_, hash, _, _, _, _, err = c.hash(password, stub)
 
 	return
+}
+
+func (c *scryptSHA256Crypter) SetParams(N, r, p int) error {
+	c.nN = N
+	c.r = r
+	c.p = p
+
+	return nil
+}
+
+func (c *scryptSHA256Crypter) SupportsStub(stub string) bool {
+	return strings.HasPrefix(stub, "$s2$")
 }
 
 func (c *scryptSHA256Crypter) makeStub() (string, error) {
