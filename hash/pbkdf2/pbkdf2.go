@@ -7,6 +7,9 @@ package pbkdf2
 
 import (
 	"crypto/rand"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 	"fmt"
 	"hash"
 	"strings"
@@ -15,7 +18,24 @@ import (
 	"github.com/pchchv/pass/scheme"
 )
 
-const SaltLength = 16
+const (
+	SaltLength              = 16
+	RecommendedRoundsSHA1   = 131000
+	RecommendedRoundsSHA256 = 29000
+	RecommendedRoundsSHA512 = 25000
+)
+
+var (
+	// Scheme implementation implementing a number of
+	// PBKDF2 modular crypt formats used by Python's passlib
+	// ($pbkdf2$, $pbkdf2-sha256$, $pbkdf2-sha512$).
+	// Uses RecommendedRounds.
+	// WARNING: SHA1 should never be used in new applications.
+	// It should only be used for compatibility with legacy applications.
+	SHA1Crypter   scheme.Scheme
+	SHA256Crypter scheme.Scheme
+	SHA512Crypter scheme.Scheme
+)
 
 type pbkdf2Scheme struct {
 	Ident    string
@@ -29,6 +49,12 @@ func New(ident string, hf func() hash.Hash, rounds int) scheme.Scheme {
 		HashFunc: hf,
 		Rounds:   rounds,
 	}
+}
+
+func init() {
+	SHA1Crypter = New("$pbkdf2$", sha1.New, RecommendedRoundsSHA1)
+	SHA256Crypter = New("$pbkdf2-sha256$", sha256.New, RecommendedRoundsSHA256)
+	SHA512Crypter = New("$pbkdf2-sha512$", sha512.New, RecommendedRoundsSHA512)
 }
 
 func (s *pbkdf2Scheme) Hash(password string) (string, error) {
@@ -66,27 +92,3 @@ func (s *pbkdf2Scheme) NeedsUpdate(stub string) bool {
 	_, rounds, salt, _, err := raw.Parse(stub)
 	return err == raw.ErrInvalidRounds || rounds < s.Rounds || len(salt) < SaltLength
 }
-
-// // An implementation of Scheme implementing a number of PBKDF2 modular crypt
-// // formats used by Python's passlib ($pbkdf2$, $pbkdf2-sha256$,
-// // $pbkdf2-sha512$).
-// //
-// // Uses RecommendedRounds.
-// //
-// // WARNING: SHA1 should not be used for new applications under any
-// // circumstances. It should be used for legacy compatibility only.
-// var SHA1Crypter scheme.Scheme
-// var SHA256Crypter scheme.Scheme
-// var SHA512Crypter scheme.Scheme
-
-// const (
-// 	RecommendedRoundsSHA1   = 131000
-// 	RecommendedRoundsSHA256 = 29000
-// 	RecommendedRoundsSHA512 = 25000
-// )
-
-// func init() {
-// 	SHA1Crypter = New("$pbkdf2$", sha1.New, RecommendedRoundsSHA1)
-// 	SHA256Crypter = New("$pbkdf2-sha256$", sha256.New, RecommendedRoundsSHA256)
-// 	SHA512Crypter = New("$pbkdf2-sha512$", sha512.New, RecommendedRoundsSHA512)
-// }
