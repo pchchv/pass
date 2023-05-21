@@ -24,6 +24,16 @@ type scryptSHA256Crypter struct {
 	p  int
 }
 
+// Returns an implementation of Scheme implementing
+// scrypt-sha256 with the specified parameters.
+func NewSHA256(N, r, p int) scheme.Scheme {
+	return &scryptSHA256Crypter{
+		nN: N,
+		r:  r,
+		p:  p,
+	}
+}
+
 func (c *scryptSHA256Crypter) Hash(password string) (hash string, err error) {
 	cScryptSHA256HashCalls.Add(1)
 	stub, err := c.makeStub()
