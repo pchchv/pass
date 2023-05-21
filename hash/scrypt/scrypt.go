@@ -18,8 +18,7 @@ type scryptSHA256Crypter struct {
 
 func (c *scryptSHA256Crypter) makeStub() (string, error) {
 	buf := make([]byte, 18)
-	_, err := rand.Read(buf)
-	if err != nil {
+	if _, err := rand.Read(buf); err != nil {
 		return "", err
 	}
 
