@@ -11,6 +11,7 @@ import (
 	"hash"
 
 	"github.com/pchchv/pass/hash/pbkdf2/raw"
+	"github.com/pchchv/pass/scheme"
 )
 
 const SaltLength = 16
@@ -31,4 +32,19 @@ func (s *pbkdf2Scheme) Hash(password string) (string, error) {
 	newHash := fmt.Sprintf("%s%d$%s$%s", s.Ident, s.Rounds, raw.Base64Encode(salt), hash)
 
 	return newHash, nil
+}
+
+func (s *pbkdf2Scheme) Verify(password, stub string) error {
+	_, rounds, salt, oldHash, err := raw.Parse(stub)
+	if err != nil {
+		return err
+	}
+
+	newHash := raw.Hash([]byte(password), salt, rounds, s.HashFunc)
+
+	if len(newHash) == 0 || !scheme.SecureCompare(oldHash, newHash) {
+		return scheme.ErrInvalidPassword
+	}
+
+	return nil
 }
