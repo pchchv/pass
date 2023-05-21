@@ -58,6 +58,10 @@ func (c *scryptSHA256Crypter) SupportsStub(stub string) bool {
 	return strings.HasPrefix(stub, "$s2$")
 }
 
+func (c *scryptSHA256Crypter) String() string {
+	return fmt.Sprintf("scrypt-sha256(%d,%d,%d)", c.nN, c.r, c.p)
+}
+
 func (c *scryptSHA256Crypter) makeStub() (string, error) {
 	buf := make([]byte, 18)
 	if _, err := rand.Read(buf); err != nil {
