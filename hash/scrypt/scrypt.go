@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	SHA256Crypter            scheme.Scheme // implementation of Scheme performing scrypt-sha256.
 	cScryptSHA256HashCalls   = expvar.NewInt("passlib.scryptsha256.hashCalls")
 	cScryptSHA256VerifyCalls = expvar.NewInt("passlib.scryptsha256.verifyCalls")
 )
@@ -22,6 +23,14 @@ type scryptSHA256Crypter struct {
 	nN int
 	r  int
 	p  int
+}
+
+func init() {
+	SHA256Crypter = NewSHA256(
+		raw.RecommendedN,
+		raw.Recommendedr,
+		raw.Recommendedp,
+	)
 }
 
 // Returns an implementation of Scheme implementing
