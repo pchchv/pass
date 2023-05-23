@@ -29,6 +29,11 @@ func (s *schemeSHA256) Hash(password string) (string, error) {
 	return mangle(h), nil
 }
 
+func (s *schemeSHA256) Verify(password, hash string) error {
+	p := s.prehash(password)
+	return s.underlying.Verify(p, demangle(hash))
+}
+
 func (s *schemeSHA256) prehash(password string) string {
 	h := sha256.New()
 	h.Write([]byte(password))
