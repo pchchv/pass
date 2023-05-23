@@ -34,6 +34,14 @@ func (s *schemeSHA256) Verify(password, hash string) error {
 	return s.underlying.Verify(p, demangle(hash))
 }
 
+func (s *schemeSHA256) NeedsUpdate(stub string) bool {
+	return s.underlying.NeedsUpdate(demangle(stub))
+}
+
+func (s *schemeSHA256) SupportsStub(stub string) bool {
+	return strings.HasPrefix(stub, "$bcrypt-sha256$") && s.underlying.SupportsStub(demangle(stub))
+}
+
 func (s *schemeSHA256) prehash(password string) string {
 	h := sha256.New()
 	h.Write([]byte(password))
