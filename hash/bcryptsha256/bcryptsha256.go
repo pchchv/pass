@@ -19,6 +19,16 @@ type schemeSHA256 struct {
 	cost       int
 }
 
+func (s *schemeSHA256) Hash(password string) (string, error) {
+	p := s.prehash(password)
+	h, err := s.underlying.Hash(p)
+	if err != nil {
+		return "", err
+	}
+
+	return mangle(h), nil
+}
+
 func (s *schemeSHA256) prehash(password string) string {
 	h := sha256.New()
 	h.Write([]byte(password))
