@@ -18,9 +18,19 @@ import (
 // The recommended cost for bcrypt-sha256.
 const RecommendedCost = bcrypt.RecommendedCost
 
+// An implementation of Scheme implementing
+// Python's passlib `$bcrypt-sha256$` bcrypt variant.
+// This is bcrypt with a SHA256 prehash,
+// which removes bcrypt's password length limitation.
+var Crypter scheme.Scheme
+
 type schemeSHA256 struct {
 	underlying scheme.Scheme
 	cost       int
+}
+
+func init() {
+	Crypter = New(bcrypt.RecommendedCost)
 }
 
 // Instantiates a new Scheme implementing bcrypt with the given cost.
