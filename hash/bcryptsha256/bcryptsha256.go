@@ -11,12 +11,24 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pchchv/pass/hash/bcrypt"
 	"github.com/pchchv/pass/scheme"
 )
+
+// The recommended cost for bcrypt-sha256.
+const RecommendedCost = bcrypt.RecommendedCost
 
 type schemeSHA256 struct {
 	underlying scheme.Scheme
 	cost       int
+}
+
+// Instantiates a new Scheme implementing bcrypt with the given cost.
+func New(cost int) scheme.Scheme {
+	return &schemeSHA256{
+		underlying: bcrypt.New(cost),
+		cost:       cost,
+	}
 }
 
 func (s *schemeSHA256) Hash(password string) (string, error) {
