@@ -42,6 +42,10 @@ func (s *schemeSHA256) SupportsStub(stub string) bool {
 	return strings.HasPrefix(stub, "$bcrypt-sha256$") && s.underlying.SupportsStub(demangle(stub))
 }
 
+func (s *schemeSHA256) String() string {
+	return fmt.Sprintf("bcrypt-sha256(%d)", s.cost)
+}
+
 func (s *schemeSHA256) prehash(password string) string {
 	h := sha256.New()
 	h.Write([]byte(password))
