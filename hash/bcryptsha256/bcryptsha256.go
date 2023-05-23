@@ -6,10 +6,20 @@
 package bcryptsha256
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
+
 	"github.com/pchchv/pass/scheme"
 )
 
 type schemeSHA256 struct {
 	underlying scheme.Scheme
 	cost       int
+}
+
+func (s *schemeSHA256) prehash(password string) string {
+	h := sha256.New()
+	h.Write([]byte(password))
+
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
