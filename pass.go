@@ -125,3 +125,8 @@ func Verify(password, hash string) (newHash string, err error) {
 func VerifyNoUpgrade(password, hash string) error {
 	return DefaultContext.VerifyNoUpgrade(password, hash)
 }
+
+// Uses the default context to determine whether a stub or hash needs updating.
+func NeedsUpdate(stub string) bool {
+	return DefaultContext.NeedsUpdate(stub)
+}
