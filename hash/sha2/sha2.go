@@ -74,6 +74,14 @@ func (c *sha2Crypter) NeedsUpdate(stub string) bool {
 	return c.needsUpdate(salt, rounds)
 }
 
+func (c *sha2Crypter) String() string {
+	if c.sha512 {
+		return fmt.Sprintf("sha512-crypt(%d)", c.rounds)
+	}
+
+	return fmt.Sprintf("sha256-crypt(%d)", c.rounds)
+}
+
 func (c *sha2Crypter) makeStub() (string, error) {
 	ch := "5"
 	if c.sha512 {
