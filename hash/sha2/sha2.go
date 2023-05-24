@@ -1,5 +1,5 @@
 // Package sha2crypt implements sha256-crypt and sha512-crypt.
-package sha2crypt
+package sha2
 
 import (
 	"crypto/rand"
