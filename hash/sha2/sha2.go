@@ -21,6 +21,18 @@ type sha2Crypter struct {
 	rounds int
 }
 
+// Returns a Scheme implementing sha256-crypt
+// using the number of rounds specified.
+func NewCrypter256(rounds int) scheme.Scheme {
+	return &sha2Crypter{false, rounds}
+}
+
+// Returns a Scheme implementing sha512-crypt
+// using the number of rounds specified.
+func NewCrypter512(rounds int) scheme.Scheme {
+	return &sha2Crypter{true, rounds}
+}
+
 func (c *sha2Crypter) Hash(password string) (hash string, err error) {
 	cSHA2CryptHashCalls.Add(1)
 
