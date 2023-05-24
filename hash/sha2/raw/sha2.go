@@ -3,6 +3,7 @@ package raw
 
 import (
 	"crypto/sha256"
+	"crypto/sha512"
 	"fmt"
 	"hash"
 	"io"
@@ -18,6 +19,10 @@ const (
 	// the number of rounds is not specified explicitly in
 	// the modular crypt format, as it is used by default.
 	DefaultRounds = 5000
+	// Recommended number of rounds for sha256-crypt and sha512-crypt.
+	// It is recommended to call sha256-crypt or
+	// sha512-crypt with this or a proportional value.
+	RecommendedRounds = 10000
 )
 
 func repeat(w io.Writer, b []byte, sz int) {
@@ -149,6 +154,17 @@ func shaCrypt(password, salt string, rounds int, newHash func() hash.Hash, trans
 // The output is in modular crypt format.
 func Crypt256(password, salt string, rounds int) string {
 	return "$5" + shaCrypt(password, salt, rounds, sha256.New, transpose256)
+}
+
+// Calculates sha256-crypt.
+// The password must be plaintext and be a UTF-8 string.
+// Salt must be a valid ASCII between 0 and 16 characters in length inclusive.
+// For suggested values for rounds, see the constants in this package.
+// Rounds must be in the range 1000 <= rounds <= 999999999.
+// Otherwise, the function panics.
+// The output is in modular crypt format.
+func Crypt512(password, salt string, rounds int) string {
+	return "$6" + shaCrypt(password, salt, rounds, sha512.New, transpose512)
 }
 
 func transpose256(b []byte) {
