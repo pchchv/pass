@@ -14,11 +14,20 @@ var (
 	errInvalidStub        = fmt.Errorf("invalid sha2 password stub")
 	cSHA2CryptHashCalls   = expvar.NewInt("passlib.sha2crypt.hashCalls")
 	cSHA2CryptVerifyCalls = expvar.NewInt("passlib.sha2crypt.verifyCalls")
+	// An implementation of Scheme performing sha256-crypt.
+	Crypter256 scheme.Scheme
+	// An implementation of Scheme performing sha512-crypt.
+	Crypter512 scheme.Scheme
 )
 
 type sha2Crypter struct {
 	sha512 bool
 	rounds int
+}
+
+func init() {
+	Crypter256 = NewCrypter256(raw.RecommendedRounds)
+	Crypter512 = NewCrypter512(raw.RecommendedRounds)
 }
 
 // Returns a Scheme implementing sha256-crypt
