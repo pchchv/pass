@@ -21,6 +21,29 @@ type Context struct {
 	Schemes []scheme.Scheme
 }
 
+// Hashes a UTF-8 plaintext password using the context and produces a password hash.
+// If stub is "", one is generated automaticaly for the preferred password hashing
+// scheme; you should specify stub as "" in almost all cases.
+// The provided or randomly generated stub is used to deterministically hash the password.
+// The returned hash is in modular crypt format.
+// If the context has not been specifically configured, a sensible default policy is used.
+// See the fields of Context.
+func (ctx *Context) Hash(password string) (hash string, err error) {
+	return ctx.schemes()[0].Hash(password)
+}
+
+// Verifies a UTF-8 plaintext password using a previously derived password hash and the default context.
+// Returns nil err only if the password is valid.
+// If the hash is determined to be deprecated based on the context policy,
+// and the password is valid,
+// the password is hashed using the preferred password hashing scheme and returned in newHash.
+// You should use this to upgrade any stored password hash in your database.
+// newHash is empty if the password was not valid or if no upgrade is required.
+// You should treat any non-nil err as a password verification error.
+func (ctx *Context) Verify(password, hash string) (newHash string, err error) {
+	return ctx.verify(password, hash, true)
+}
+
 func (ctx *Context) schemes() []scheme.Scheme {
 	if ctx.Schemes == nil {
 		return DefaultSchemes
