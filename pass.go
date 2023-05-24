@@ -110,3 +110,18 @@ func Hash(password string) (hash string, err error) {
 	return DefaultContext.Hash(password)
 }
 
+// Verifies a UTF-8 plaintext password using a previously derived password hash and the default context.
+// Returns nil err only if the password is valid.
+// If the hash is determined to be deprecated based on policy, and the password is valid,
+// the password is hashed using the preferred password hashing scheme and returned in newHash.
+// You should use this to upgrade any stored password hash in your database.
+// newHash is empty if the password was invalid or no upgrade is required.
+// You should treat any non-nil err as a password verification error.
+func Verify(password, hash string) (newHash string, err error) {
+	return DefaultContext.Verify(password, hash)
+}
+
+// Verify, but never upgrades.
+func VerifyNoUpgrade(password, hash string) error {
+	return DefaultContext.VerifyNoUpgrade(password, hash)
+}
