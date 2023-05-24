@@ -3,16 +3,33 @@ package sha2crypt
 
 import (
 	"crypto/rand"
+	"expvar"
 	"fmt"
 
 	"github.com/pchchv/pass/hash/sha2/raw"
 )
 
-var errInvalidStub = fmt.Errorf("invalid sha2 password stub")
+var (
+	errInvalidStub      = fmt.Errorf("invalid sha2 password stub")
+	cSHA2CryptHashCalls = expvar.NewInt("passlib.sha2crypt.hashCalls")
+)
 
 type sha2Crypter struct {
 	sha512 bool
 	rounds int
+}
+
+func (c *sha2Crypter) Hash(password string) (hash string, err error) {
+	cSHA2CryptHashCalls.Add(1)
+
+	stub, err := c.makeStub()
+	if err != nil {
+		return "", err
+	}
+
+	_, hash, _, _, err = c.hash(password, stub)
+
+	return
 }
 
 func (c *sha2Crypter) makeStub() (string, error) {
