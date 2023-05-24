@@ -43,6 +43,6 @@ func init() {
 	DefaultSchemes = defaultSchemes
 }
 
-func UseDefaults(date string) {
+func UseDefaults() {
 	DefaultSchemes = defaultSchemes
 }
