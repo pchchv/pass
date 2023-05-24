@@ -45,6 +45,18 @@ func (c *sha2Crypter) Verify(password, hash string) (err error) {
 	return
 }
 
+// Changes the default rounds for the crypter.
+// Be warned that this is a global setting.
+// The default default value is RecommendedRounds.
+func (c *sha2Crypter) SetRounds(rounds int) error {
+	if rounds < raw.MinimumRounds || rounds > raw.MaximumRounds {
+		return raw.ErrInvalidRounds
+	}
+
+	c.rounds = rounds
+	return nil
+}
+
 func (c *sha2Crypter) makeStub() (string, error) {
 	ch := "5"
 	if c.sha512 {
