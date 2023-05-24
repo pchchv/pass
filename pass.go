@@ -11,6 +11,10 @@ import (
 	"github.com/pchchv/pass/scheme"
 )
 
+// The default context, which uses sensible defaults.
+// Most users should not reconfigure this.
+var DefaultContext Context
+
 // Context is a password hashing context that uses a
 // given set of schemes to hash and validate passwords.
 type Context struct {
@@ -96,3 +100,13 @@ func (ctx *Context) verify(password, hash string, canUpgrade bool) (newHash stri
 
 	return "", scheme.ErrUnsupportedScheme
 }
+
+// Hashes a UTF-8 plaintext password using the
+// default context and produces a password hash.
+// Chooses the preferred password hashing scheme
+// based on the configured policy.
+// The default policy is sensible.
+func Hash(password string) (hash string, err error) {
+	return DefaultContext.Hash(password)
+}
+
