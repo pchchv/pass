@@ -7,11 +7,13 @@ import (
 	"fmt"
 
 	"github.com/pchchv/pass/hash/sha2/raw"
+	"github.com/pchchv/pass/scheme"
 )
 
 var (
-	errInvalidStub      = fmt.Errorf("invalid sha2 password stub")
-	cSHA2CryptHashCalls = expvar.NewInt("passlib.sha2crypt.hashCalls")
+	errInvalidStub        = fmt.Errorf("invalid sha2 password stub")
+	cSHA2CryptHashCalls   = expvar.NewInt("passlib.sha2crypt.hashCalls")
+	cSHA2CryptVerifyCalls = expvar.NewInt("passlib.sha2crypt.verifyCalls")
 )
 
 type sha2Crypter struct {
@@ -28,6 +30,17 @@ func (c *sha2Crypter) Hash(password string) (hash string, err error) {
 	}
 
 	_, hash, _, _, err = c.hash(password, stub)
+
+	return
+}
+
+func (c *sha2Crypter) Verify(password, hash string) (err error) {
+	cSHA2CryptVerifyCalls.Add(1)
+
+	_, newHash, _, _, err := c.hash(password, hash)
+	if err == nil && !scheme.SecureCompare(hash, newHash) {
+		return scheme.ErrInvalidPassword
+	}
 
 	return
 }
