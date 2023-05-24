@@ -140,6 +140,12 @@ func shaCrypt(password, salt string, rounds int, newHash func() hash.Hash, trans
 	return fmt.Sprintf("$rounds=%d$%s$%s", rounds, salt, hstr)
 }
 
+// Calculates sha256-crypt.
+// The password must be plaintext and be a UTF-8 string.
+// Salt must be a valid ASCII between 0 and 16 characters in length inclusive.
+// For suggested values for rounds, see the constants in this package.
+// Rounds must be in the range 1000 <= rounds <= 999999999.
+// Otherwise, the function panics.
 // The output is in modular crypt format.
 func Crypt256(password, salt string, rounds int) string {
 	return "$5" + shaCrypt(password, salt, rounds, sha256.New, transpose256)
