@@ -28,3 +28,30 @@ func (ctx *Context) schemes() []scheme.Scheme {
 
 	return ctx.Schemes
 }
+
+func (ctx *Context) verify(password, hash string, canUpgrade bool) (newHash string, err error) {
+	for i, scheme := range ctx.schemes() {
+		if !scheme.SupportsStub(hash) {
+			continue
+		}
+
+		err = scheme.Verify(password, hash)
+		if err != nil {
+			return "", err
+		}
+
+		if i != 0 || scheme.NeedsUpdate(hash) {
+			if canUpgrade {
+				// If the scheme is not the first scheme, try and rehash with the
+				// preferred scheme.
+				if newHash, err2 := ctx.Hash(password); err2 == nil {
+					return newHash, nil
+				}
+			}
+		}
+
+		return "", nil
+	}
+
+	return "", scheme.ErrUnsupportedScheme
+}
