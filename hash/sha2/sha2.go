@@ -57,6 +57,14 @@ func (c *sha2Crypter) SetRounds(rounds int) error {
 	return nil
 }
 
+func (c *sha2Crypter) SupportsStub(stub string) bool {
+	if len(stub) < 3 || stub[0] != '$' || stub[2] != '$' {
+		return false
+	}
+
+	return (stub[1] == '5' && !c.sha512) || (stub[1] == '6' && c.sha512)
+}
+
 func (c *sha2Crypter) makeStub() (string, error) {
 	ch := "5"
 	if c.sha512 {
