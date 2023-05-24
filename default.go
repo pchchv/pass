@@ -1,5 +1,15 @@
 package pass
 
+import (
+	"github.com/pchchv/pass/hash/argon2"
+	"github.com/pchchv/pass/hash/bcrypt"
+	"github.com/pchchv/pass/hash/bcryptsha256"
+	"github.com/pchchv/pass/hash/pbkdf2"
+	"github.com/pchchv/pass/hash/scrypt"
+	"github.com/pchchv/pass/hash/sha2"
+	"github.com/pchchv/pass/scheme"
+)
+
 var (
 	// Default schemes, the most preferred ones first.
 	// The first scheme will be used to hash passwords,
@@ -15,4 +25,20 @@ var (
 	// You need to call UseDefaults to allow your application to switch to newer hash schemes
 	// (either set DefaultSchemes manually, or create a custom context with its own set of schemes).
 	DefaultSchemes []scheme.Scheme
+
+	defaultSchemes = []scheme.Scheme{
+		argon2.Crypter,
+		bcrypt.Crypter,
+		scrypt.SHA256Crypter,
+		pbkdf2.SHA512Crypter,
+		pbkdf2.SHA256Crypter,
+		pbkdf2.SHA1Crypter,
+		bcryptsha256.Crypter,
+		sha2.Crypter512,
+		sha2.Crypter256,
+	}
 )
+
+func init() {
+	DefaultSchemes = defaultSchemes
+}
