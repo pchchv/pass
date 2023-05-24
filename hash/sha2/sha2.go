@@ -65,6 +65,15 @@ func (c *sha2Crypter) SupportsStub(stub string) bool {
 	return (stub[1] == '5' && !c.sha512) || (stub[1] == '6' && c.sha512)
 }
 
+func (c *sha2Crypter) NeedsUpdate(stub string) bool {
+	_, salt, _, rounds, err := raw.Parse(stub)
+	if err != nil {
+		return false
+	}
+
+	return c.needsUpdate(salt, rounds)
+}
+
 func (c *sha2Crypter) makeStub() (string, error) {
 	ch := "5"
 	if c.sha512 {
@@ -101,4 +110,8 @@ func (c *sha2Crypter) hash(password, stub string) (oldHash, newHash, salt string
 	}
 
 	return oldHash, raw.Crypt256(password, salt, rounds), salt, rounds, nil
+}
+
+func (c *sha2Crypter) needsUpdate(salt string, rounds int) bool {
+	return rounds < c.rounds || len(salt) < 16
 }
