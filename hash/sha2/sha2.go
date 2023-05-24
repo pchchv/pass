@@ -8,6 +8,8 @@ import (
 	"github.com/pchchv/pass/hash/sha2/raw"
 )
 
+var errInvalidStub = fmt.Errorf("invalid sha2 password stub")
+
 type sha2Crypter struct {
 	sha512 bool
 	rounds int
@@ -32,4 +34,21 @@ func (c *sha2Crypter) makeStub() (string, error) {
 	}
 
 	return fmt.Sprintf("$%s$rounds=%d$%s", ch, c.rounds, salt), nil
+}
+
+func (c *sha2Crypter) hash(password, stub string) (oldHash, newHash, salt string, rounds int, err error) {
+	isSHA512, salt, oldHash, rounds, err := raw.Parse(stub)
+	if err != nil {
+		return "", "", "", 0, err
+	}
+
+	if isSHA512 != c.sha512 {
+		return "", "", "", 0, errInvalidStub
+	}
+
+	if c.sha512 {
+		return oldHash, raw.Crypt512(password, salt, rounds), salt, rounds, nil
+	}
+
+	return oldHash, raw.Crypt256(password, salt, rounds), salt, rounds, nil
 }
