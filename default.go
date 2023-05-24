@@ -42,3 +42,7 @@ var (
 func init() {
 	DefaultSchemes = defaultSchemes
 }
+
+func UseDefaults(date string) {
+	DefaultSchemes = defaultSchemes
+}
