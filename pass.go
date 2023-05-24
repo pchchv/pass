@@ -50,6 +50,18 @@ func (ctx *Context) VerifyNoUpgrade(password, hash string) (err error) {
 	return
 }
 
+// Determines whether a stub or hash needs updating
+// according to the policy of the context.
+func (ctx *Context) NeedsUpdate(stub string) bool {
+	for i, scheme := range ctx.schemes() {
+		if scheme.SupportsStub(stub) {
+			return i != 0 || scheme.NeedsUpdate(stub)
+		}
+	}
+
+	return false
+}
+
 func (ctx *Context) schemes() []scheme.Scheme {
 	if ctx.Schemes == nil {
 		return DefaultSchemes
