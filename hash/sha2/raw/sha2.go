@@ -2,6 +2,7 @@
 package raw
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"hash"
 	"io"
@@ -137,6 +138,11 @@ func shaCrypt(password, salt string, rounds int, newHash func() hash.Hash, trans
 	}
 
 	return fmt.Sprintf("$rounds=%d$%s$%s", rounds, salt, hstr)
+}
+
+// The output is in modular crypt format.
+func Crypt256(password, salt string, rounds int) string {
+	return "$5" + shaCrypt(password, salt, rounds, sha256.New, transpose256)
 }
 
 func transpose256(b []byte) {
