@@ -44,6 +44,12 @@ func (ctx *Context) Verify(password, hash string) (newHash string, err error) {
 	return ctx.verify(password, hash, true)
 }
 
+// Like Verify, but does not hash an upgrade password when upgrade is required.
+func (ctx *Context) VerifyNoUpgrade(password, hash string) (err error) {
+	_, err = ctx.verify(password, hash, false)
+	return
+}
+
 func (ctx *Context) schemes() []scheme.Scheme {
 	if ctx.Schemes == nil {
 		return DefaultSchemes
